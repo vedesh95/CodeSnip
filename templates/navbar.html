@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Snippet</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Highlight.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css" rel="stylesheet">
+    <style>
+        .card-body {
+            max-height: none !important; /* Disable max-height for card body */
+            padding: 0; /* Remove padding to fit code directly */
+        }
+        .code-container {
+            max-height: none !important; /* Disable max-height for code container */
+            overflow-y: visible !important; /* Disable vertical scrolling */
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header .card-title {
+            margin-bottom: 0; /* Remove margin bottom for card title */
+        }
+        .btn-group {
+            margin-left: auto; /* Push button group to right corner */
+        }
+        body {
+            background-image: url('https://images.unsplash.com/photo-1531685250784-7569952593d2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YmFja2dyb3VuZHxlbnwwfHwwfHx8MA%3D%3D');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #f0f0f0; /* Fallback background color */
+            color: #333;
+        }
+    </style>
+</head>
+<body>    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand text-black" href="/">
+                        <img src="data:image/png;base64,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" alt="Logo" width="30" height="30" class="d-inline-block align-top">
+                        CodeSnip
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <button type="button" class="btn"><a class="btn btn-success" href="/"><b>+</b> Snip</a></button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            </div>
+        </div>
+    </div>

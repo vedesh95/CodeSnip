@@ -1,0 +1,4 @@
+.code-block {
+    max-height: 500px; /* Set a maximum height as per your requirement */
+    overflow-y: auto; /* Enable vertical scrollbar if content exceeds max height */
+}
