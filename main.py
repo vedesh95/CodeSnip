@@ -57,7 +57,7 @@ async def update_snippet(updatedSnip: UpdatedSnip):
     snippet = collection.update_one({"_id": ObjectId(updatedSnip.snipID)}, {"$set": {"code": updatedSnip.code}})
     if snippet.matched_count == 0:
         raise HTTPException(status_code=404, detail="Snippet not found")
-    return {"message": "Snippet updated successfully","status_code": "200"}
+    return {"message": "Snippet updated successfully"}
 
 #delete a snippet
 @app.post("/deletesnippet/{snippet_id}")
