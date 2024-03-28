@@ -8,16 +8,28 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title">{{ snippet.title }}</h5>
-         
+                    
                     <div class="btn-group me-2">
+                        {% if update == 1 %}
+                        <button class="btn btn-success border border-dark" id="update-code-btn">Save</button>
+                        {% else %}
+                        <button class="btn btn-secondary border border-dark" id="update-snip-btn">Update</button>
+                        <button class="btn btn-danger border border-dark" id="delete-snip-btn">Delete</button>
+                        {% endif %}
+                        <button class="btn btn-light border border-dark" id="copy-snipid-btn" value="{{ snippet._id }}">Copy SnipID</button>
                         <button class="btn btn-light border border-dark" id="copy-code-btn">Copy Code</button>
                         <button class="btn btn-light border border-dark" id="copy-url-btn">Copy URL</button>
+
                     </div>
 
                 </div>
                 <div class="card-body">
                     <!-- Ensure that snippet.code is properly formatted within <pre><code> tags -->
+                    {% if update == 1 %}
+                    <pre id="editable-code" class="code-container" contenteditable="true"><code class="{{ snippet.language }}">{{ snippet.code | escape }}</code></pre>
+                    {% else %}
                     <pre class="code-container"><code class="{{ snippet.language }}">{{ snippet.code | escape }}</code></pre>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -33,32 +45,109 @@
     // Wait for document ready event to ensure DOM is fully loaded
     document.addEventListener("DOMContentLoaded", function() {
         // Initialize Highlight.js for syntax highlighting
-        hljs.highlightAll();
+        hljs.highlightAll();    
+    });
 
-        document.getElementById('copy-code-btn').addEventListener('click', function() {
-            var codeElement = document.querySelector('.code-container code');
-            var range = document.createRange();
-            range.selectNode(codeElement);
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            
-        });
+    document.getElementById('copy-code-btn').addEventListener('click', function() {
+        var codeElement = document.querySelector('.code-container code');
+        var range = document.createRange();
+        range.selectNode(codeElement);
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        
+    });
 
-        // Copy URL button click event
-        document.getElementById('copy-url-btn').addEventListener('click', function() {
-            var url = window.location.href;
-            navigator.clipboard.writeText(url)
-            .then(() => {
-                
-            })
-            .catch(err => {
-                console.error('Failed to copy URL: ', err);
-            });
+    // Copy URL button click event
+    document.getElementById('copy-url-btn').addEventListener('click', function() {
+        var url = window.location.href;
+        navigator.clipboard.writeText(url)
+        .then(() => {
+            console.log(url)
+        })
+        .catch(err => {
+            console.error('Failed to copy URL: ', err);
         });
     });
+
+    document.getElementById('copy-snipid-btn').addEventListener('click',function(){
+        var snipID = document.getElementById('copy-snipid-btn').value;
+        navigator.clipboard.writeText(snipID)
+        .then(() => {
+            console.log(snipID)
+        })
+        .catch(err => {
+            console.error('Failed to copy snipID: ', err);
+        });
+    });
+
+    if(document.getElementById('delete-snip-btn')){
+        document.getElementById('delete-snip-btn').addEventListener('click', function() {
+            console.log("delete snip btn clicked");
+            var snippetId = document.getElementById('copy-snipid-btn').value;
+            if (snippetId) {
+                // Construct the URL with the snippet ID
+                var url = "/deletesnippet/" + snippetId;
+                
+                // Send a POST request using Fetch API
+                fetch(url, {
+                    method: "POST"
+                })
+                .then(response => {
+                    // Handle the response, if needed
+                    console.log(response);
+                    if(response.ok){
+                        alert("deleted!")
+                    }else{
+                        alert("failed to delete")
+                    }
+                    window.location.href = `/`
+                })
+            } else {
+                // Handle case where snippet ID is not provided
+                console.error("Snippet ID is required.");
+            }
+        }); 
+    }
+
+
+    if( document.getElementById('update-snip-btn') ){
+        document.getElementById('update-snip-btn').addEventListener('click', function() {
+            console.log("update snip btn clicked");
+            var snippetId = document.getElementById('copy-snipid-btn').value;
+            window.location.href = `/snippets/${snippetId}?update=1`
+        });       
+    }
+
+    if( document.getElementById('update-code-btn') ){
+        document.getElementById('update-code-btn').addEventListener('click', function() {
+            // Disable the textarea and submit button while submitting
+            var updatedCode = document.getElementById('editable-code').textContent;
+            var snipID = document.getElementById('copy-snipid-btn').value;
+            console.log(updatedCode, snipID)
+            const updatedSnip = {
+                snipID: snipID,
+                code: updatedCode
+            };
+            console.log(updatedSnip)
+            // Send POST request to /snippets/ endpoint
+            fetch('/updatesnippet/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedSnip)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                window.location.href = `/snippets/${snipID}`
+            })
+            .catch(error => console.error('Error adding snippet:', error));
+        });
+    }
+    
 </script>
 
 </body>
 </html>
-

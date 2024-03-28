@@ -21,6 +21,10 @@ class Snippet(BaseModel):
     language: str
     code: str
 
+class UpdatedSnip(BaseModel):
+    snipID: str
+    code: str
+
 #get home page to view the form
 @app.get("/", response_class=HTMLResponse)
 async def read_snippets():
@@ -29,35 +33,36 @@ async def read_snippets():
 
 #get a snippet
 @app.get("/snippets/{snippet_id}", response_class=HTMLResponse)
-async def read_snippet(snippet_id: str):
+async def read_snippet(snippet_id: str,update: int = 0):
+    print(update)
     snippet = collection.find_one({"_id": ObjectId(snippet_id)})
     if not snippet:
         raise HTTPException(status_code=404, detail="Snippet not found")
     template = templates_env.get_template("view_snippet.html")
-    return template.render(snippet=snippet)
+    return template.render(snippet=snippet,update=update)
 
 #create a snippet
 @app.post("/snippets/")
 async def create_snippet(snippet: Snippet):
     snippet_data = snippet.dict()
     inserted_snippet = collection.insert_one(snippet_data)
+    if not inserted_snippet:
+        raise HTTPException(status_code=404, detail="Snippet not found")
     snippet_id = str(inserted_snippet.inserted_id)
     return snippet_id
 
 #Update a snippet
-@app.put("/snippets/{snippet_id}")
-async def update_snippet(snippet_id: str, snippet: Snippet):
-    snippet_data = snippet.dict()
-    result = collection.update_one({"_id": ObjectId(snippet_id)}, {"$set": snippet_data})
-    if result.modified_count == 0:
+@app.post("/updatesnippet/")
+async def update_snippet(updatedSnip: UpdatedSnip):
+    snippet = collection.update_one({"_id": ObjectId(updatedSnip.snipID)}, {"$set": {"code": updatedSnip.code}})
+    if snippet.matched_count == 0:
         raise HTTPException(status_code=404, detail="Snippet not found")
-    return {"id": snippet_id, "message": "Snippet updated successfully"}
+    return {"message": "Snippet updated successfully","status_code": "200"}
 
 #delete a snippet
-@app.post("/deletesnippets/{snippet_id}")
+@app.post("/deletesnippet/{snippet_id}")
 async def delete_snippet(snippet_id: str):
     result = collection.delete_one({"_id": ObjectId(snippet_id)})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Snippet not found")
-    template = templates_env.get_template("delete_snippet.html")
-    return template.render()
+    return {"message": "Snippet updated successfully"}

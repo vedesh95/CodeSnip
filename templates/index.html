@@ -25,6 +25,27 @@
                 </form>
             </div>
             
+            <div class="col-md-2">
+                <div class="row">
+                    <h5 class="mt-1 mb-1">Delete Snip:</h5>
+                    <form id="delete-snippet-form">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="snippet_id" name="snippet_id" placeholder="Enter Snippet ID:" required>
+                        </div>
+                        <button type="button" id="delete-btn" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </div>
+
+                <div class="row mt-3">
+                    <h5 class="mt-1 mb-1">Update Snip:</h5>
+                    <form id="update-snippet-form">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="snippet_id_update" name="snippet_id_update" placeholder="Enter Snippet ID:" required>
+                        </div>
+                        <button type="button" id="update-btn" class="btn btn-sm btn-success">Update</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -33,74 +54,103 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // List of languages supported by Highlight.js
-        const languages = [
-            "plaintext",
-            "apache",
-            "bash",
-            "c",
-            "cpp",
-            "cs",
-            "css",
-            "diff",
-            "dockerfile",
-            "xml",
-            "http",
-            "ini",
-            "java",
-            "javascript",
-            "json",
-            "makefile",
-            "markdown",
-            "nginx",
-            "objectivec",
-            "perl",
-            "php",
-            "powershell",
-            "python",
-            "ruby",
-            "sql",
-            "yaml",
-            "typescript",
-            "kotlin",
-            "swift"
-        ];
+    const languages = [
+        "plaintext",
+        "apache",
+        "bash",
+        "c",
+        "cpp",
+        "cs",
+        "css",
+        "diff",
+        "dockerfile",
+        "xml",
+        "http",
+        "ini",
+        "java",
+        "javascript",
+        "json",
+        "makefile",
+        "markdown",
+        "nginx",
+        "objectivec",
+        "perl",
+        "php",
+        "powershell",
+        "python",
+        "ruby",
+        "sql",
+        "yaml",
+        "typescript",
+        "kotlin",
+        "swift"
+    ];
 
-        // Populate the dropdown select with language options
-        const languageSelect = document.getElementById('language');
-        languages.forEach(lang => {
-            const option = document.createElement('option');
-            option.text = lang;
-            option.value = lang;
-            languageSelect.appendChild(option);
-        });
+    // Populate the dropdown select with language options
+    const languageSelect = document.getElementById('language');
+    languages.forEach(lang => {
+        const option = document.createElement('option');
+        option.text = lang;
+        option.value = lang;
+        languageSelect.appendChild(option);
+    });
 
-        // Handle form submission
-        document.getElementById('snippet-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+    // Handle form submission
+    document.getElementById('snippet-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
 
-            // Get form data
-            const formData = new FormData(event.target);
-            const snippetData = {
-                title: formData.get('title'),
-                language: formData.get('language'),
-                code: formData.get('code')
-            };
+        // Get form data
+        const formData = new FormData(event.target);
+        const snippetData = {
+            title: formData.get('title'),
+            language: formData.get('language'),
+            code: formData.get('code')
+        };
 
-            // Send POST request to /snippets/ endpoint
-            fetch('/snippets/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(snippetData)
+        // Send POST request to /snippets/ endpoint
+        fetch('/snippets/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(snippetData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            window.location.href = `/snippets/${data}`
+        })
+        .catch(error => console.error('Error adding snippet:', error));
+    });
+    document.getElementById("delete-btn").addEventListener("click", function() {
+        var snippetId = document.getElementById("snippet_id").value;
+        if (snippetId) {
+            // Construct the URL with the snippet ID
+            var url = "/deletesnippet/" + snippetId;
+            
+            // Send a POST request using Fetch API
+            fetch(url, {
+                method: "POST"
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                window.location.href = `/snippets/${data}`
+            .then(response => {
+                // Handle the response, if needed
+                console.log(response);
+                if(response.ok){
+                    alert("deleted!")
+                }else{
+                    alert("failed to delete")
+                }
+                window.location.href = `/`
             })
-            .catch(error => console.error('Error adding snippet:', error));
-        });
+        } else {
+            // Handle case where snippet ID is not provided
+            console.error("Snippet ID is required.");
+        }
+    });
+    document.getElementById('update-btn').addEventListener('click', function() {
+        var snippetId = document.getElementById("snippet_id_update").value;
+        window.location.href = `/snippets/${snippetId}?update=1`
+    });
     </script>
 </body>
 </html>
